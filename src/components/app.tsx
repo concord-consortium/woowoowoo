@@ -15,10 +15,9 @@ type State = {
 }
 
 const initialState: State = {
-  view: "sensor-view",
+  view: "set-display-name",
   history: {},
   muteAudio: false,
-  displayName: "Developer"
 }
 
 export type ComponentProps = {
