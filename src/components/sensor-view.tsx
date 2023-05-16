@@ -127,6 +127,32 @@ export const SensorView = (props: ComponentProps) => {
     )
   }
 
+  const renderViz = () => {
+    const keys = Object.keys(state.history)
+    if (keys.length === 0) {
+      return null;
+    }
+    keys.sort()
+
+    const svgWidth = 400
+    const svgHeight = 400
+
+    return (
+
+      <div>
+        <svg xmlns="http://www.w3.org/2000/svg" width={svgWidth} height={svgHeight}>
+          {keys.map((key, index) => {
+            const values = state.history[key]
+            const currentValue = values[values.length - 1]
+            return (
+              <circle cx={svgWidth/2} cy={svgHeight/2} r={currentValue} fill={getColor(key)}/>
+            )
+          })}
+          </svg>
+        </div>
+    )
+  }
+
   return (
     <>
       <nav className="bg-blue-500 p-4">
@@ -152,7 +178,7 @@ export const SensorView = (props: ComponentProps) => {
             <h2 className="text-gray-800 text-lg font-bold">
               Data viz
             </h2>
-            <p className="text-gray-700">Content goes here...</p>
+            {renderViz()}
           </div>
         </div>
 
