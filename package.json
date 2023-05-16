@@ -1,5 +1,5 @@
 {
-  "name": "parcel-tailwind-test",
+  "name": "woowoowoo",
   "version": "1.0.0",
   "description": "",
   "source": "src/index.html",
@@ -8,7 +8,7 @@
     "build": "parcel build"
   },
   "keywords": [],
-  "author": "Doug Martin",
+  "author": "Doug Martin and Joe Bacal",
   "license": "MIT",
   "devDependencies": {
     "@types/react": "^18.2.6",
