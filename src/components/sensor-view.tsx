@@ -1,5 +1,6 @@
 
 import React, { useEffect} from "react"
+import {produce} from "immer"
 import { ComponentProps } from "./app"
 import { createClient } from "@supabase/supabase-js"
 
@@ -19,21 +20,29 @@ type SensorPayload = {
 }
 
 export const SensorView = (props: ComponentProps) => {
-  const displayName  = props.state.displayName!;
+  const {state, setState} = props
+  const displayName  = state.displayName!;
   const [channelStatus, setChannelStatus] = React.useState<ChannelStatus>("CLOSED");
-  const [payload, setPayload] = React.useState<any>(null);
 
   useEffect(() => {
     channel
-    .on('broadcast', { event: 'supa' }, (payload) => {
-      setPayload(payload);
+    .on('broadcast', { event: 'supa' }, (message) => {
+      const payload = message.payload as SensorPayload
+      savePayload(payload)
     })
     .subscribe((status) => {
       setChannelStatus(status)
     })
   }, [])
-    // subscribe to channel "woowoowoo
 
+  const savePayload = (payload: SensorPayload) => {
+    setState(prev => {
+      return produce(prev, draft =>{
+        draft.history[payload.displayName] = draft.history[payload.displayName] || []
+        draft.history[payload.displayName].push(payload.num)
+      });
+    })
+  }
 
   const handleNameClick = () => {
     props.setState(prev => ({...prev, view: "set-display-name"}))
@@ -47,14 +56,13 @@ export const SensorView = (props: ComponentProps) => {
       event: 'supa',
       payload
     });
+    savePayload(payload)
   }
 
   return (
     <>
-
       <nav className="bg-blue-500 p-4">
         <div className="container mx-auto flex justify-between">
-
           <h1 className="text-white text-xl">WooWooWoo</h1>
           <div className="text-white font-bold mt-1" onClick={handleNameClick}>{ props.state.displayName }</div>
         </div>
@@ -65,7 +73,7 @@ export const SensorView = (props: ComponentProps) => {
           <div className="w-1/2 bg-white p-4">
             <h2 className="text-gray-800 text-lg font-bold">Data</h2>
             <div>{ channelStatus }</div>
-            <div className="text-gray-700"><pre>{ JSON.stringify(payload, null, 2) }</pre></div>
+            <div className="text-gray-700"><pre>{ JSON.stringify(state.history, null, 2) }</pre></div>
             <button onClick={sendDummyData}>Send Dummy Data</button>
           </div>
           <div className="w-1/2 bg-white p-4">
@@ -74,9 +82,6 @@ export const SensorView = (props: ComponentProps) => {
           </div>
         </div>
       </div>
-
-    </>
-
+   </>
   )
-
 }
