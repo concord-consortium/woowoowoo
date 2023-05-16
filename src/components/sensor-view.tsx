@@ -27,6 +27,14 @@ const getColor = (seed: string) => {
   return "#" + randomDarkColor(seed)
 }
 
+let startingFreq = 0
+let audioCtx = new AudioContext();
+let osc = audioCtx.createOscillator();
+osc.frequency.value = startingFreq;
+osc.start()
+osc.connect(audioCtx.destination);
+
+
 export const SensorView = (props: ComponentProps) => {
   const {state, setState} = props
   const displayName  = state.displayName!;
@@ -86,6 +94,12 @@ export const SensorView = (props: ComponentProps) => {
     }
     keys.sort()
 
+    const lastValues = keys.map(key => state.history[key][state.history[key].length - 1])
+    const currentValue = lastValues.reduce((acc, val) => acc + val, 0) / lastValues.length
+
+    osc.frequency.value = currentValue + 120;
+    console.log(osc.frequency.value);
+
     return (
       <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -125,6 +139,7 @@ export const SensorView = (props: ComponentProps) => {
   }
 
   const renderViz = () => {
+
     const keys = Object.keys(state.history)
     if (keys.length === 0) {
       return null;
@@ -171,10 +186,7 @@ export const SensorView = (props: ComponentProps) => {
             {renderDataTable()}
           </div>
 
-          <div className="w-1/2 bg-white p-4">
-            <h2 className="text-gray-800 text-lg font-bold">
-              Data viz
-            </h2>
+          <div className="w-1/2 bg-white p-4 justify-center align-middle" >
             {renderViz()}
           </div>
         </div>
