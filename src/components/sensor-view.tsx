@@ -12,8 +12,14 @@ const supa = createClient(url, key);
 const channel = supa.channel("woowoowoo");
 
 type ChannelStatus = "SUBSCRIBED" | "TIMED_OUT" | "CLOSED" | "CHANNEL_ERROR"
-export const SensorView = (props: ComponentProps) => {
 
+type SensorPayload = {
+  num: number
+  displayName: string
+}
+
+export const SensorView = (props: ComponentProps) => {
+  const displayName  = props.state.displayName!;
   const [channelStatus, setChannelStatus] = React.useState<ChannelStatus>("CLOSED");
   const [payload, setPayload] = React.useState<any>(null);
 
@@ -24,13 +30,6 @@ export const SensorView = (props: ComponentProps) => {
     })
     .subscribe((status) => {
       setChannelStatus(status)
-      // if (status === 'SUBSCRIBED') {
-      //   channel.send({
-      //     type: 'broadcast',
-      //     event: 'supa',
-      //     payload: { org: 'supabase' },
-      //   })
-      // }
     })
   }, [])
     // subscribe to channel "woowoowoo
@@ -41,14 +40,14 @@ export const SensorView = (props: ComponentProps) => {
   }
 
   const sendDummyData = () => {
-    console.log("sendDummyData!")
+    console.log("sending dummy data")
+    const payload:SensorPayload = { displayName, num: Math.random() }
     channel.send({
       type: 'broadcast',
       event: 'supa',
-      payload: { num: Math.random() },
+      payload
     });
   }
-
 
   return (
     <>
