@@ -1,5 +1,5 @@
 
-import React, { useEffect} from "react"
+import React, { useEffect, useRef} from "react"
 import { useSerial } from "../useSerial"
 import {produce} from "immer"
 import Sparkline from 'react-sparkline-svg';
@@ -14,12 +14,7 @@ const url = "https://ubtydghcxtctomddmcjl.supabase.co"
 const key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVidHlkZ2hjeHRjdG9tZGRtY2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE2ODQyNDcwMTUsImV4cCI6MTk5OTgyMzAxNX0.5U8EqTtGyGGyfyn0pW0DCrsTcSJ9vOOnBdVc9kiXRLk"
 
 const supa = createClient(url, key);
-const channel = supa.channel("woowoowoo");
 const HISTORY_LENGTH = 10
-
-const unsubscribe = async () => {
-  await channel.unsubscribe()
-}
 
 type ChannelStatus = "SUBSCRIBED" | "TIMED_OUT" | "CLOSED" | "CHANNEL_ERROR"
 
@@ -39,8 +34,10 @@ export const SensorView = (props: ComponentProps) => {
 
   const { isStreaming, val, openStream } = useSerial();
 
+  const channelRef = useRef(supa.channel("woowoowoo"))
+
   useEffect(() => {
-    channel
+    channelRef.current
     .on('broadcast', { event: 'supa' }, (message) => {
       const payload = message.payload as SensorPayload
       savePayload(payload)
@@ -50,7 +47,7 @@ export const SensorView = (props: ComponentProps) => {
     })
 
     return () => {
-      unsubscribe()
+      channelRef.current.unsubscribe()
     }
   }, []);
 
@@ -74,7 +71,7 @@ export const SensorView = (props: ComponentProps) => {
 
   const sendSensorData = (num: number) => {
     const payload:SensorPayload = { displayName, num }
-    channel.send({
+    channelRef.current.send({
       type: 'broadcast',
       event: 'supa',
       payload
