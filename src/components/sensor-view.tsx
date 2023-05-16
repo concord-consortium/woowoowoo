@@ -3,6 +3,7 @@ import React, { useEffect} from "react"
 import { useSerial } from "../useSerial"
 import {produce} from "immer"
 import Sparkline from 'react-sparkline-svg';
+import { randomDarkColor } from 'seed-to-color'
 
 import { ComponentProps } from "./app"
 import { createClient } from "@supabase/supabase-js"
@@ -16,11 +17,19 @@ const supa = createClient(url, key);
 const channel = supa.channel("woowoowoo");
 const HISTORY_LENGTH = 10
 
+const unsubscribe = async () => {
+  await channel.unsubscribe()
+}
+
 type ChannelStatus = "SUBSCRIBED" | "TIMED_OUT" | "CLOSED" | "CHANNEL_ERROR"
 
 type SensorPayload = {
   num: number
   displayName: string
+}
+
+const getColor = (seed: string) => {
+  return "#" + randomDarkColor(seed)
 }
 
 export const SensorView = (props: ComponentProps) => {
@@ -39,6 +48,10 @@ export const SensorView = (props: ComponentProps) => {
     .subscribe((status) => {
       setChannelStatus(status)
     })
+
+    return () => {
+      unsubscribe()
+    }
   }, []);
 
   useEffect(() => {
@@ -92,19 +105,19 @@ export const SensorView = (props: ComponentProps) => {
           </tr>
         </thead>
         <tbody>
-          {keys.map(key => {
+          {keys.map((key, index) => {
             const values = state.history[key]
             const currentValue = values[values.length - 1]
             return (
-              <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+              <tr key={`${key}-${index}`} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                <th scope="row" style={{color: getColor(key)}} className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                   {key}
                 </th>
                 <td className="px-6 py-4">
                   {currentValue}
                 </td>
                 <td className="px-6 py-4" style={{height: 100}}>
-                  <Sparkline values={values} />;
+                  <Sparkline values={values} />
                 </td>
               </tr>
             )
