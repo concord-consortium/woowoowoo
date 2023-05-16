@@ -2,6 +2,8 @@
 import React, { useEffect} from "react"
 import { useSerial } from "../useSerial"
 import {produce} from "immer"
+import Sparkline from 'react-sparkline-svg';
+
 import { ComponentProps } from "./app"
 import { createClient } from "@supabase/supabase-js"
 
@@ -101,8 +103,8 @@ export const SensorView = (props: ComponentProps) => {
                 <td className="px-6 py-4">
                   {currentValue}
                 </td>
-                <td className="px-6 py-4">
-                  {JSON.stringify(values)}
+                <td className="px-6 py-4" style={{height: 100}}>
+                  <Sparkline values={values} />;
                 </td>
               </tr>
             )
