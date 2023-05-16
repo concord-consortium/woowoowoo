@@ -67,11 +67,22 @@ export const SensorView = (props: ComponentProps) => {
     savePayload(payload)
   }
 
+  const renderDataTable = () => {
+    const keys = Object.keys(state.history)
+    if (keys.length === 0) {
+      return null;
+    }
+    return (
+      <div className="text-gray-700"><pre>{ JSON.stringify(state.history, null, 2) }</pre></div>
+    )
+  }
+
   return (
     <>
       <nav className="bg-blue-500 p-4">
         <div className="container mx-auto flex justify-between">
           <h1 className="text-white text-xl">WooWooWoo</h1>
+          <div>{ channelStatus }</div>
           <div className="text-white font-bold mt-1" onClick={handleNameClick}>{ props.state.displayName }</div>
         </div>
       </nav>
@@ -85,8 +96,7 @@ export const SensorView = (props: ComponentProps) => {
         <div className="flex">
           <div className="w-1/2 bg-white p-4">
             <h2 className="text-gray-800 text-lg font-bold">Data</h2>
-            <div>{ channelStatus }</div>
-            <div className="text-gray-700"><pre>{ JSON.stringify(state.history, null, 2) }</pre></div>
+            {renderDataTable()}
           </div>
           <div className="w-1/2 bg-white p-4">
             <h2 className="text-gray-800 text-lg font-bold">Visualization</h2>
