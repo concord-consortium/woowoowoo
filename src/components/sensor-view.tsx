@@ -132,23 +132,26 @@ export const SensorView = (props: ComponentProps) => {
       <nav className="bg-blue-500 p-4">
         <div className="container mx-auto flex justify-between">
           <h1 className="text-white text-xl">WooWooWoo</h1>
-          <div>{ channelStatus }</div>
+          <div className="text-white mt-1">{ channelStatus }</div>
+          <div className="text-white mt-1">
+            <button onClick={openStream}>{isStreaming ? "🔌" : "⚡️"}</button>
+          </div>
           <div className="text-white font-bold mt-1" onClick={handleNameClick}>{ props.state.displayName }</div>
         </div>
       </nav>
 
-      <div>serial<br/>
-          <button onClick={openStream}>{isStreaming ? "Stop" : "Start"}</button>
-          <div>{val}</div>
-        </div>
+
 
       <div className="container mx-auto mt-4">
         <div className="flex">
           <div className="w-1/2 bg-white p-4">
             {renderDataTable()}
           </div>
+
           <div className="w-1/2 bg-white p-4">
-            <h2 className="text-gray-800 text-lg font-bold">Visualization</h2>
+            <h2 className="text-gray-800 text-lg font-bold">
+              Data viz
+            </h2>
             <p className="text-gray-700">Content goes here...</p>
           </div>
         </div>
