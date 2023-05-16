@@ -5,7 +5,8 @@
   "source": "src/index.html",
   "scripts": {
     "start": "parcel",
-    "build": "parcel build"
+    "build": "parcel build",
+    "deploy": "firebase deploy"
   },
   "keywords": [],
   "author": "Doug Martin and Joe Bacal",
