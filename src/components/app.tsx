@@ -7,7 +7,7 @@ import { SetDisplayName } from "./set-display-name"
 type SensorValue = number
 
 type State = {
-  view: "sensor-setup"|"set-display-name"|"sensor-view"
+  view: "set-display-name"|"sensor-view"
   displayName?: string
   sensorValue?: SensorValue
   history: Record<string,SensorValue[]>
@@ -29,14 +29,9 @@ export const App = () => {
   const [state, setState] = useState<State>(initialState)
   const {view, displayName} = state
 
-  switch (view) {
-    case "sensor-setup":
-      return <SensorSetup state={state} setState={setState}/>
-
-    case "set-display-name":
-      return <SetDisplayName state={state} setState={setState}/>
-
-    case "sensor-setup":
-      return <SensorView state={state} setState={setState}/>
+  if ((displayName === undefined) || (view === "set-display-name")) {
+    return <SetDisplayName state={state} setState={setState}/>
   }
+
+  return <SensorView state={state} setState={setState}/>
 }
