@@ -12,6 +12,7 @@ const key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZi
 
 const supa = createClient(url, key);
 const channel = supa.channel("woowoowoo");
+const HISTORY_LENGTH = 10
 
 type ChannelStatus = "SUBSCRIBED" | "TIMED_OUT" | "CLOSED" | "CHANNEL_ERROR"
 
@@ -36,12 +37,17 @@ export const SensorView = (props: ComponentProps) => {
     .subscribe((status) => {
       setChannelStatus(status)
     })
-  }, [])
+  }, []);
+
+  useEffect(() => {
+    sendSensorData(val)
+  }, [val]);
 
   const savePayload = (payload: SensorPayload) => {
     setState(prev => {
       return produce(prev, draft =>{
         draft.history[payload.displayName] = draft.history[payload.displayName] || []
+        draft.history[payload.displayName] = draft.history[payload.displayName].slice(-HISTORY_LENGTH)
         draft.history[payload.displayName].push(payload.num)
       });
     })
@@ -51,9 +57,8 @@ export const SensorView = (props: ComponentProps) => {
     props.setState(prev => ({...prev, view: "set-display-name"}))
   }
 
-  const sendSensorData = () => {
-
-    const payload:SensorPayload = { displayName, num: Math.random() }
+  const sendSensorData = (num: number) => {
+    const payload:SensorPayload = { displayName, num }
     channel.send({
       type: 'broadcast',
       event: 'supa',
@@ -71,23 +76,24 @@ export const SensorView = (props: ComponentProps) => {
         </div>
       </nav>
 
+      <div>serial<br/>
+          <button onClick={openStream}>{isStreaming ? "Stop" : "Start"}</button>
+          <div>{val}</div>
+        </div>
+
       <div className="container mx-auto mt-4">
         <div className="flex">
           <div className="w-1/2 bg-white p-4">
             <h2 className="text-gray-800 text-lg font-bold">Data</h2>
             <div>{ channelStatus }</div>
             <div className="text-gray-700"><pre>{ JSON.stringify(state.history, null, 2) }</pre></div>
-            <button onClick={sendSensorData}>Send Sensor Data</button>
           </div>
           <div className="w-1/2 bg-white p-4">
             <h2 className="text-gray-800 text-lg font-bold">Visualization</h2>
             <p className="text-gray-700">Content goes here...</p>
           </div>
         </div>
-        <div>serial<br/>
-          <button onClick={openStream}>{isStreaming ? "Stop" : "Start"}</button>
-          <div>{val}</div>
-        </div>
+
       </div>
    </>
   )
