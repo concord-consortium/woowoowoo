@@ -1,5 +1,6 @@
 
 import React, { useEffect} from "react"
+import { useSerial } from "../useSerial"
 import {produce} from "immer"
 import { ComponentProps } from "./app"
 import { createClient } from "@supabase/supabase-js"
@@ -23,6 +24,8 @@ export const SensorView = (props: ComponentProps) => {
   const {state, setState} = props
   const displayName  = state.displayName!;
   const [channelStatus, setChannelStatus] = React.useState<ChannelStatus>("CLOSED");
+
+  const { isStreaming, val, openStream } = useSerial();
 
   useEffect(() => {
     channel
@@ -48,8 +51,8 @@ export const SensorView = (props: ComponentProps) => {
     props.setState(prev => ({...prev, view: "set-display-name"}))
   }
 
-  const sendDummyData = () => {
-    console.log("sending dummy data")
+  const sendSensorData = () => {
+
     const payload:SensorPayload = { displayName, num: Math.random() }
     channel.send({
       type: 'broadcast',
@@ -74,12 +77,16 @@ export const SensorView = (props: ComponentProps) => {
             <h2 className="text-gray-800 text-lg font-bold">Data</h2>
             <div>{ channelStatus }</div>
             <div className="text-gray-700"><pre>{ JSON.stringify(state.history, null, 2) }</pre></div>
-            <button onClick={sendDummyData}>Send Dummy Data</button>
+            <button onClick={sendSensorData}>Send Sensor Data</button>
           </div>
           <div className="w-1/2 bg-white p-4">
             <h2 className="text-gray-800 text-lg font-bold">Visualization</h2>
             <p className="text-gray-700">Content goes here...</p>
           </div>
+        </div>
+        <div>serial<br/>
+          <button onClick={openStream}>{isStreaming ? "Stop" : "Start"}</button>
+          <div>{val}</div>
         </div>
       </div>
    </>
