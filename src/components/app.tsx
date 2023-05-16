@@ -1,4 +1,5 @@
 import React, { useState } from "react"
+import { useEffect } from "react"
 import { SensorSetup } from "./sensor-setup"
 import { SensorView } from "./sensor-view"
 import { SetDisplayName } from "./set-display-name"
@@ -14,7 +15,7 @@ type State = {
 }
 
 const initialState: State = {
-  view:"sensor-setup",
+  view: "set-display-name",
   history: {},
   muteAudio: false,
 }
@@ -26,7 +27,7 @@ export type ComponentProps = {
 
 export const App = () => {
   const [state, setState] = useState<State>(initialState)
-  const {view} = state
+  const {view, displayName} = state
 
   switch (view) {
     case "sensor-setup":
