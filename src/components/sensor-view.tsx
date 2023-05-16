@@ -67,11 +67,57 @@ export const SensorView = (props: ComponentProps) => {
     savePayload(payload)
   }
 
+  const renderDataTable = () => {
+    const keys = Object.keys(state.history)
+    if (keys.length === 0) {
+      return null;
+    }
+    keys.sort()
+
+    return (
+      <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+          <tr>
+            <th scope="col" className="px-6 py-3">
+              Display Name
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Current Value
+            </th>
+            <th scope="col" className="px-6 py-3">
+              History
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {keys.map(key => {
+            const values = state.history[key]
+            const currentValue = values[values.length - 1]
+            return (
+              <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                  {key}
+                </th>
+                <td className="px-6 py-4">
+                  {currentValue}
+                </td>
+                <td className="px-6 py-4">
+                  {JSON.stringify(values)}
+                </td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
+    )
+  }
+
   return (
     <>
       <nav className="bg-blue-500 p-4">
         <div className="container mx-auto flex justify-between">
           <h1 className="text-white text-xl">WooWooWoo</h1>
+          <div>{ channelStatus }</div>
           <div className="text-white font-bold mt-1" onClick={handleNameClick}>{ props.state.displayName }</div>
         </div>
       </nav>
@@ -84,9 +130,7 @@ export const SensorView = (props: ComponentProps) => {
       <div className="container mx-auto mt-4">
         <div className="flex">
           <div className="w-1/2 bg-white p-4">
-            <h2 className="text-gray-800 text-lg font-bold">Data</h2>
-            <div>{ channelStatus }</div>
-            <div className="text-gray-700"><pre>{ JSON.stringify(state.history, null, 2) }</pre></div>
+            {renderDataTable()}
           </div>
           <div className="w-1/2 bg-white p-4">
             <h2 className="text-gray-800 text-lg font-bold">Visualization</h2>
