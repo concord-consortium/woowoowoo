@@ -1,11 +1,54 @@
-import React from "react"
-import { ComponentProps } from "./app"
 
+import React, { useEffect} from "react"
+import { ComponentProps } from "./app"
+import { createClient } from "@supabase/supabase-js"
+
+// create a supabase client that listens to channel "woowoowoo"
+
+const url = "https://ubtydghcxtctomddmcjl.supabase.co"
+const key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVidHlkZ2hjeHRjdG9tZGRtY2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE2ODQyNDcwMTUsImV4cCI6MTk5OTgyMzAxNX0.5U8EqTtGyGGyfyn0pW0DCrsTcSJ9vOOnBdVc9kiXRLk"
+
+const supa = createClient(url, key);
+const channel = supa.channel("woowoowoo");
+
+type ChannelStatus = "SUBSCRIBED" | "TIMED_OUT" | "CLOSED" | "CHANNEL_ERROR"
 export const SensorView = (props: ComponentProps) => {
+
+  const [channelStatus, setChannelStatus] = React.useState<ChannelStatus>("CLOSED");
+  const [payload, setPayload] = React.useState<any>(null);
+
+  useEffect(() => {
+    channel
+    .on('broadcast', { event: 'supa' }, (payload) => {
+      setPayload(payload);
+    })
+    .subscribe((status) => {
+      setChannelStatus(status)
+      // if (status === 'SUBSCRIBED') {
+      //   channel.send({
+      //     type: 'broadcast',
+      //     event: 'supa',
+      //     payload: { org: 'supabase' },
+      //   })
+      // }
+    })
+  }, [])
+    // subscribe to channel "woowoowoo
+
 
   const handleNameClick = () => {
     props.setState(prev => ({...prev, view: "set-display-name"}))
   }
+
+  const sendDummyData = () => {
+    console.log("sendDummyData!")
+    channel.send({
+      type: 'broadcast',
+      event: 'supa',
+      payload: { num: Math.random() },
+    });
+  }
+
 
   return (
     <>
@@ -22,7 +65,9 @@ export const SensorView = (props: ComponentProps) => {
         <div className="flex">
           <div className="w-1/2 bg-white p-4">
             <h2 className="text-gray-800 text-lg font-bold">Data</h2>
-            <p className="text-gray-700">Content goes here...</p>
+            <div>{ channelStatus }</div>
+            <div className="text-gray-700"><pre>{ JSON.stringify(payload, null, 2) }</pre></div>
+            <button onClick={sendDummyData}>Send Dummy Data</button>
           </div>
           <div className="w-1/2 bg-white p-4">
             <h2 className="text-gray-800 text-lg font-bold">Visualization</h2>
